@@ -75,7 +75,7 @@ class Joplin(object):
             return None, False
         items = json['items']
         has_more = json['has_more']
-        objects = list([cls(**item) for item in items])
+        objects = list([cls(**{"type_": 1, **item}) for item in items])
         return objects, has_more
 
     def _get_by_path(self, cls, path, **kwargs):
