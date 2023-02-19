@@ -1,8 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import os
+import pathlib
+import time
 import json
 
 import requests
+import subprocess
 
 from .node import FolderNode, NoteNode, ResourceNode, TagNode, factory_node
 
@@ -15,7 +19,7 @@ class Joplin(object):
         self.port = port
         self.base_url = 'http://%s:%d' % (host, port)
 
-    def ping(self):
+    def ping(self, retries=3):
         """Testing if the service is available
         :returns: bool
 
@@ -26,7 +30,15 @@ class Joplin(object):
             r = requests.get(url)
             succ = r.status_code == 200 and r.text == 'JoplinClipperServer'
         except requests.ConnectionError:
-            print('Joplin: joplin.app not available')
+            if not retries:
+                print('Joplin: joplin.app not available')
+                return False
+            joplin_exec = pathlib.Path.home() / ".nvm"/ "versions"/ "node"/ "v14.17.0" / "bin"/ "joplin"
+            joplin_profile = pathlib.Path.home() / ".config" / "joplin-desktop"
+            FNULL = open(os.devnull, 'w')
+            subprocess.Popen([joplin_exec.resolve(), "--profile", joplin_profile.resolve(), "server", "start"], stderr=subprocess.STDOUT, stdout=FNULL, close_fds=True)
+            time.sleep(2)
+            return self.ping()
         except Exception:
             print('Joplin: joplin.app error')
         return succ

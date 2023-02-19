@@ -352,7 +352,7 @@ class Win(object):
             winnr = vim.Function('bufwinnr')(bufname())
             if winnr < 0:
                 note_bufname = vim.Function('bufname')()
-                self.open()
+                #self.open()
                 vim.Function('winrestview')(winview_saved)
                 winnr = vim.Function('bufwinnr')(note_bufname)
                 vim.command('%dwincmd w' % winnr)
