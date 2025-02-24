@@ -34,7 +34,11 @@ class Joplin(object):
                 print('Joplin: joplin.app not available')
                 return False
             joplin_exec = pathlib.Path.home() / ".nvm"/ "versions"/ "node"/ "v14.17.0" / "bin"/ "joplin"
-            joplin_profile = pathlib.Path.home() / ".config" / "joplin-desktop"
+
+            if profile := os.environ.get("JOPLIN_PROFILE", None):
+                joplin_profile = pathlib.Path(profile)
+            else:
+                joplin_profile = pathlib.Path.home() / ".config" / "joplin-desktop"
             FNULL = open(os.devnull, 'w')
             subprocess.Popen([joplin_exec.resolve(), "--profile", joplin_profile.resolve(), "server", "start"], stderr=subprocess.STDOUT, stdout=FNULL, close_fds=True)
             time.sleep(2)
